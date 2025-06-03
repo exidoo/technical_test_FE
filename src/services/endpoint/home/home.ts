@@ -7,7 +7,7 @@ export const ArticleData = {
   },
 
   getDataTesla: () => {
-    return Api.get<GetDataArticle>('everything?q=tesla&from=2025-05-02&sortBy=publishedAt&apiKey=7c4a9bd0390943699d5a2943e9274e64');
+    return Api.get<GetDataArticle>('everything?q=tesla&from=2025-05-03&sortBy=publishedAt&apiKey=7c4a9bd0390943699d5a2943e9274e64');
   },
 
   getDataBusiness: () => {

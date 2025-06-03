@@ -79,7 +79,7 @@ const News = () => {
                   <div className="flex gap-4 p-3 rounded-lg  hover:shadow-lg transition-shadow duration-300 w-full">
                     <img
                       src={article.urlToImage || '/image/news-handle.jpeg'}
-                      alt={article.title}
+                      alt="News Image"
                       className="w-[150px] h-[100px] rounded-lg object-cover"
                       onError={(e) => {
                         e.currentTarget.onerror = null;

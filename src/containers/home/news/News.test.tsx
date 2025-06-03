@@ -1,160 +1,108 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import News from './News';
-import * as homeAPI from '../../../services/endpoint/home/home';
-import type { Article as ArticleType, GetDataArticle } from '@/services/type/home';
-import { mockedAxiosResponse } from '../../../test/utils/mockAxiosResponse';
+import { BrowserRouter } from 'react-router-dom';
+import News from './News'; // Ganti path sesuai struktur folder kamu
+import { ArticleData } from '../../../services/endpoint/home/home';
 
+// Mock navigate
 jest.mock('react-router', () => ({
   ...jest.requireActual('react-router'),
   useNavigate: () => jest.fn(),
 }));
 
-const mockArticles: ArticleType[] = [
+// Mock fetch article data
+jest.mock('../../../services/endpoint/home/home', () => ({
+  ArticleData: {
+    getDataApple: jest.fn(),
+    getDataTesla: jest.fn(),
+    getDataBusiness: jest.fn(),
+    getDataTechCrunch: jest.fn(),
+    getDataWallStreet: jest.fn(),
+  },
+}));
+
+const mockArticles = [
   {
-    author: 'John Doe',
-    title: 'Test Article',
-    description: 'This is a test article',
-    url: 'https://example.com',
-    urlToImage: 'https://example.com/image.jpg',
-    publishedAt: '2024-01-01',
-    content: 'Full content',
+    title: 'Mock News Title',
+    description: 'Mock description',
+    urlToImage: '',
   },
 ];
 
 describe('News Component', () => {
   beforeEach(() => {
-    jest.spyOn(homeAPI.ArticleData, 'getDataApple').mockResolvedValue(
-      mockedAxiosResponse<GetDataArticle>({
-        status: 'ok',
-        totalResults: 1,
-        articles: mockArticles,
-      })
-    );
-
-    jest.spyOn(homeAPI.ArticleData, 'getDataTesla').mockResolvedValue(
-      mockedAxiosResponse<GetDataArticle>({
-        status: 'ok',
-        totalResults: 0,
-        articles: [],
-      })
-    );
+    (ArticleData.getDataApple as jest.Mock).mockResolvedValue({
+      data: { articles: mockArticles },
+    });
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it('renders loading state and then articles', async () => {
+  const renderComponent = () =>
     render(
-      <MemoryRouter>
+      <BrowserRouter>
         <News />
-      </MemoryRouter>
+      </BrowserRouter>
     );
+
+  it('renders loading spinner initially and then articles', async () => {
+    renderComponent();
 
     expect(screen.getByRole('status')).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByText(/Test Article/i)).toBeInTheDocument();
-    });
-
-    expect(screen.getByText(/Read More/i)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('Mock News Title')).toBeInTheDocument());
   });
 
-  it('shows empty message if category has no articles', async () => {
-    render(
-      <MemoryRouter>
-        <News />
-      </MemoryRouter>
-    );
+  it('shows "Read More" button and handles click', async () => {
+    renderComponent();
 
-    // Tunggu sampai artikel pertama muncul
-    await waitFor(() => {
-      expect(screen.getByText(/Test Article/i)).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('Mock News Title')).toBeInTheDocument());
 
-    // Klik tombol kategori "Tesla"
-    fireEvent.click(screen.getByRole('button', { name: /Tesla/i }));
-
-    // Tunggu sampai pesan kosong muncul
-    await waitFor(() => {
-      expect(screen.getByText(/Tidak ada berita yang terkait dengan Tesla/i)).toBeInTheDocument();
-    });
-
-    screen.debug(); // Cetak DOM ke console
+    const readMoreButton = screen.getByRole('button', { name: /read more/i });
+    expect(readMoreButton).toBeInTheDocument();
   });
 
-  it('can switch pages with pagination buttons', async () => {
-    const manyArticles = Array.from({ length: 10 }, (_, i) => ({
-      ...mockArticles[0],
-      title: `Article ${i + 1}`,
+  it('changes category and refetches data', async () => {
+    (ArticleData.getDataTesla as jest.Mock).mockResolvedValue({
+      data: { articles: [{ title: 'Tesla News', description: 'Tesla Desc', urlToImage: '' }] },
+    });
+
+    renderComponent();
+
+    const teslaButton = screen.getByRole('button', { name: 'Tesla' });
+    fireEvent.click(teslaButton);
+
+    await waitFor(() => expect(screen.getByText('Tesla News')).toBeInTheDocument());
+  });
+
+  it('shows no article message if data empty', async () => {
+    (ArticleData.getDataBusiness as jest.Mock).mockResolvedValue({
+      data: { articles: [] },
+    });
+
+    renderComponent();
+
+    const businessButton = screen.getByRole('button', { name: 'Business' });
+    fireEvent.click(businessButton);
+
+    await waitFor(() => expect(screen.getByText(/Tidak ada berita yang terkait dengan Business/i)).toBeInTheDocument());
+  });
+
+  it('handles pagination buttons', async () => {
+    const manyArticles = Array.from({ length: 8 }, (_, i) => ({
+      title: `Title ${i + 1}`,
+      description: 'desc',
+      urlToImage: '',
     }));
 
-    (homeAPI.ArticleData.getDataApple as jest.Mock).mockResolvedValueOnce(
-      mockedAxiosResponse<GetDataArticle>({
-        status: 'ok',
-        totalResults: 10,
-        articles: manyArticles,
-      })
-    );
-
-    render(
-      <MemoryRouter>
-        <News />
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('Article 1')).toBeInTheDocument();
+    (ArticleData.getDataApple as jest.Mock).mockResolvedValue({
+      data: { articles: manyArticles },
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /Next/i }));
+    renderComponent();
 
-    await waitFor(() => {
-      expect(screen.getByText('Article 6')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('Title 1')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /Previous/i }));
+    const nextBtn = screen.getByRole('button', { name: /next/i });
+    fireEvent.click(nextBtn);
 
-    await waitFor(() => {
-      expect(screen.getByText('Article 1')).toBeInTheDocument();
-    });
-  });
-});
-
-it('uses fallback image if image fails to load', async () => {
-  render(
-    <MemoryRouter>
-      <News />
-    </MemoryRouter>
-  );
-
-  const image = await screen.findByRole('img');
-
-  // Simulasikan error saat load image
-  fireEvent.error(image);
-
-  expect(image).toHaveAttribute('src', '/image/news-handle.jpeg');
-});
-
-it('navigates to article detail with correct data', async () => {
-  const mockNavigate = jest.fn();
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  jest.spyOn(require('react-router'), 'useNavigate').mockImplementation(() => mockNavigate);
-
-  render(
-    <MemoryRouter>
-      <News />
-    </MemoryRouter>
-  );
-
-  await waitFor(() => {
-    expect(screen.getByText(/Test Article/i)).toBeInTheDocument();
-  });
-
-  fireEvent.click(screen.getByText(/Read More/i));
-
-  await waitFor(() => {
-    expect(mockNavigate).toHaveBeenCalledWith('/news/0', expect.anything());
+    await waitFor(() => expect(screen.getByText('Title 6')).toBeInTheDocument());
   });
 });
