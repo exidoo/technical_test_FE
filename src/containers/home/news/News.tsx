@@ -3,17 +3,20 @@ import { useEffect, useState } from 'react';
 
 // Services
 import { type Article as ArticleType } from '@/services/type/home';
-import { Article } from '@/services/endpoint/home/home';
+import { ArticleData } from '../../../services/endpoint/home/home';
 
 // Router
 import { useNavigate } from 'react-router';
 
+// Components
+import { Button } from 'antd';
+
 const CATEGORY_OPTIONS = [
-  { label: 'Apple', key: 'apple', fetch: Article.getDataApple },
-  { label: 'Tesla', key: 'tesla', fetch: Article.getDataTesla },
-  { label: 'Business', key: 'business', fetch: Article.getDataBusiness },
-  { label: 'TechCrunch', key: 'techcrunch', fetch: Article.getDataTechCrunch },
-  { label: 'Wall Street', key: 'wallstreet', fetch: Article.getDataWallStreet },
+  { label: 'Apple', key: 'apple', fetch: ArticleData.getDataApple },
+  { label: 'Tesla', key: 'tesla', fetch: ArticleData.getDataTesla },
+  { label: 'Business', key: 'business', fetch: ArticleData.getDataBusiness },
+  { label: 'TechCrunch', key: 'techcrunch', fetch: ArticleData.getDataTechCrunch },
+  { label: 'Wall Street', key: 'wallstreet', fetch: ArticleData.getDataWallStreet },
 ];
 
 const News = () => {
@@ -64,7 +67,7 @@ const News = () => {
           <h2 className="text-xl font-bold mb-2">{CATEGORY_OPTIONS.find((c) => c.key === activeCategory)?.label} News</h2>
 
           {loading ? (
-            <div className="flex justify-center items-center py-10">
+            <div role="status" aria-live="polite" className="flex justify-center items-center py-10">
               <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : articles.length === 0 ? (
@@ -88,8 +91,9 @@ const News = () => {
                       <h1 className="font-semibold line-clamp-2">{article.title}</h1>
                       <p className="text-sm text-gray-600 break-words whitespace-normal  line-clamp-2">{article.description}</p>
 
-                      <button
-                        className="bg-blue-600 text-white mt-2 p-1 rounded-lg cursor-pointer px-2"
+                      <Button
+                        className="mt-2 p-1 rounded-lg cursor-pointer px-2"
+                        type="primary"
                         onClick={() =>
                           navigate(`/news/${index}`, {
                             state: {
@@ -100,7 +104,7 @@ const News = () => {
                         }
                       >
                         Read More
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </li>
@@ -110,12 +114,12 @@ const News = () => {
 
           {/* Tombol Load More */}
           <div className="mt-4 flex gap-2 items-center justify-center">
-            <button disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)} className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 cursor-pointer">
+            <Button disabled={currentPage === 1} type="primary" onClick={() => setCurrentPage((prev) => prev - 1)} className="px-4 py-2  rounded disabled:opacity-50 cursor-pointer">
               Previous
-            </button>
-            <button disabled={endIndex >= articles.length} onClick={() => setCurrentPage((prev) => prev + 1)} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 cursor-pointer">
+            </Button>
+            <Button disabled={endIndex >= articles.length} type="primary" onClick={() => setCurrentPage((prev) => prev + 1)} className="px-4 py-2  rounded disabled:opacity-50 cursor-pointer">
               Next
-            </button>
+            </Button>
           </div>
         </div>
 

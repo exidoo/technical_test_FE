@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router';
 
 // Service
 import { type Article as ArticleType } from '@/services/type/home';
-import { Article } from '@/services/endpoint/home/home';
+import { ArticleData } from '@/services/endpoint/home/home';
 
 // React Tools
 import { useEffect, useState } from 'react';
@@ -20,7 +20,7 @@ const NewsDetail = () => {
   useEffect(() => {
     const fetchRecommended = async () => {
       try {
-        const response = await Article.getDataBusiness(); // bisa ganti ke getDataTesla/dll
+        const response = await ArticleData.getDataBusiness(); // bisa ganti ke getDataTesla/dll
         const articles = response.data.articles || [];
 
         // Hapus artikel yang sedang ditampilkan

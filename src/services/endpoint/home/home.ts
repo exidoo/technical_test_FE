@@ -1,7 +1,7 @@
-import Api from '@/helpers/Api';
+import Api from '../../../helpers/Api';
 import type { GetDataArticle } from '@/services/type/home';
 
-export const Article = {
+export const ArticleData = {
   getDataApple: () => {
     return Api.get<GetDataArticle>('everything?q=apple&from=2025-06-01&to=2025-06-01&sortBy=popularity&apiKey=7c4a9bd0390943699d5a2943e9274e64');
   },

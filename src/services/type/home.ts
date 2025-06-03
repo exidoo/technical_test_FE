@@ -5,7 +5,6 @@ export interface GetDataArticle {
 }
 
 export interface Article {
-  source: Source;
   author: string | null;
   title: string;
   description: string;

@@ -1,4 +1,26 @@
 {
-  "files": [],
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": ["jest", "node"] // ⬅️ Tambahkan ini
+  },
+  "include": [
+    "src", // folder utama
+    "src/**/*.test.ts", // test file .ts
+    "src/**/*.test.tsx", // test file .tsx
+    "src/jest.setup.ts" // (jika ada setup react-testing-library)
+  ],
   "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }
