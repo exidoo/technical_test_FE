@@ -52,7 +52,14 @@ const NewsDetail = () => {
         </nav>
 
         <h1 className="text-2xl font-bold mb-2">{article.title}</h1>
-        <img src={article.urlToImage || '/image/news-handle.jpeg'} className="w-full h-auto rounded mb-4" />
+        <img
+          src={article.urlToImage || '/image/news-handle.jpeg'}
+          className="w-full h-auto rounded mb-4"
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = '/image/news-handle.jpeg';
+          }}
+        />
         <p className="text-gray-700 mb-4 lg:text-lg">{article.content || article.description}</p>
 
         {article.url && (
@@ -68,9 +75,11 @@ const NewsDetail = () => {
         <ul className="space-y-4">
           {recommendedArticles.map((item: ArticleType, idx: number) => (
             <li key={idx} className="cursor-pointer mb-8" onClick={() => navigate(`/news/${idx}`, { state: { article: item, allArticles } })}>
-              <div className="flex gap-2">
-                <img src={item.urlToImage || '/image/news-handle.jpeg'} alt="thumb" className="w-[100px] h-[60px] rounded object-cover" />
-                <p className="text-sm line-clamp-2">{item.title}</p>
+              <div className="flex gap-2 items-center ">
+                <img src={item.urlToImage || '/image/news-handle.jpeg'} alt="thumb" className="w-[100px] h-[60px] rounded object-cover grow-1 " />
+                <div className=" w-[170px]">
+                  <p className="text-sm line-clamp-2">{item.title}</p>
+                </div>
               </div>
             </li>
           ))}

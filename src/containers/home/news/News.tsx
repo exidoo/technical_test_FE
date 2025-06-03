@@ -73,22 +73,23 @@ const News = () => {
             <ul className="space-y-4">
               {paginatedArticles.map((article, index) => (
                 <li key={index} className="flex items-center mb-8">
-                  <div className="flex gap-4 p-3 rounded-lg  hover:shadow-lg transition-shadow duration-300">
+                  <div className="flex gap-4 p-3 rounded-lg  hover:shadow-lg transition-shadow duration-300 w-full">
                     <img
                       src={article.urlToImage || '/image/news-handle.jpeg'}
-                      alt={article.urlToImage}
-                      srcSet={article.urlToImage}
+                      alt={article.title}
                       className="w-[150px] h-[100px] rounded-lg object-cover"
                       onError={(e) => {
+                        e.currentTarget.onerror = null;
                         e.currentTarget.src = '/image/news-handle.jpeg';
                       }}
                     />
-                    <div className="ml-2">
+
+                    <div className="ml-2 lg:w-[60%]">
                       <h1 className="font-semibold line-clamp-2">{article.title}</h1>
                       <p className="text-sm text-gray-600 break-words whitespace-normal  line-clamp-2">{article.description}</p>
 
                       <button
-                        className="bg-blue-600 text-white mt-2 p-1 rounded-lg cursor-pointer"
+                        className="bg-blue-600 text-white mt-2 p-1 rounded-lg cursor-pointer px-2"
                         onClick={() =>
                           navigate(`/news/${index}`, {
                             state: {
