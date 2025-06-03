@@ -1,11 +1,7 @@
 import { Menu } from 'antd';
 import { Header } from 'antd/es/layout/layout';
 
-const items = [
-  { key: '1', label: 'Home' },
-  { key: '2', label: 'About' },
-  { key: '3', label: 'News' },
-];
+const items = [{ key: '1', label: 'Home' }];
 
 const Navbar = () => {
   return (

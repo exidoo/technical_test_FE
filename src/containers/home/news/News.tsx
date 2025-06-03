@@ -43,7 +43,6 @@ const News = () => {
       selectedCategory
         .fetch()
         .then((res) => {
-          console.log('DATA DARI API:', res.data.articles); // 🔍 log data masuk
           setDataMap((prev) => ({ ...prev, [activeCategory]: res.data.articles }));
         })
         .finally(() => {
@@ -85,10 +84,20 @@ const News = () => {
                       }}
                     />
                     <div className="ml-2">
-                      <h1 className="font-semibold">{article.title}</h1>
+                      <h1 className="font-semibold line-clamp-2">{article.title}</h1>
                       <p className="text-sm text-gray-600 break-words whitespace-normal  line-clamp-2">{article.description}</p>
 
-                      <button className="bg-blue-600 text-white mt-2 p-1 rounded-lg cursor-pointer" onClick={() => navigate(`/news/${index}`, { state: { article } })}>
+                      <button
+                        className="bg-blue-600 text-white mt-2 p-1 rounded-lg cursor-pointer"
+                        onClick={() =>
+                          navigate(`/news/${index}`, {
+                            state: {
+                              article,
+                              allArticles: dataMap[activeCategory] || [], // ✅ kirim semua artikel
+                            },
+                          })
+                        }
+                      >
                         Read More
                       </button>
                     </div>
@@ -99,7 +108,7 @@ const News = () => {
           )}
 
           {/* Tombol Load More */}
-          <div className="mt-4 flex gap-2">
+          <div className="mt-4 flex gap-2 items-center justify-center">
             <button disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => prev - 1)} className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 cursor-pointer">
               Previous
             </button>
