@@ -1,5 +1,5 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router';
 import News from './News'; // Ganti path sesuai struktur folder kamu
 import { ArticleData } from '../../../services/endpoint/home/home';
 
