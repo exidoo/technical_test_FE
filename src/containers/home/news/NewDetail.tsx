@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // Router
 import { useLocation, useNavigate } from 'react-router';
 
 // Service
 import { type Article as ArticleType } from '@/services/type/home';
-import { ArticleData } from '@/services/endpoint/home/home';
+import { ArticleData } from '../../../services/endpoint/home/home';
 
 // React Tools
 import { useEffect, useState } from 'react';
@@ -14,31 +15,34 @@ const NewsDetail = () => {
 
   const [recommendedArticles, setRecommendedArticles] = useState<ArticleType[]>([]);
 
-  const article = state?.article;
+  const article = state?.article ?? null;
   const allArticles = state?.allArticles || [];
 
+  // Buat fungsi fetchRecommended di luar useEffect
+  const fetchRecommended = async () => {
+    if (!article) return;
+    try {
+      const response = await ArticleData.getDataBusiness();
+      const articles = response.data.articles || [];
+
+      const shuffled = articles
+        .filter((a: ArticleType) => a.title !== article.title)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 5);
+
+      setRecommendedArticles(shuffled);
+    } catch (error) {
+      console.error('Gagal mengambil rekomendasi artikel:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchRecommended = async () => {
-      try {
-        const response = await ArticleData.getDataBusiness(); // bisa ganti ke getDataTesla/dll
-        const articles = response.data.articles || [];
-
-        // Hapus artikel yang sedang ditampilkan
-        const shuffled = articles
-          .filter((a: ArticleType) => a.title !== article.title)
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 5);
-
-        setRecommendedArticles(shuffled);
-      } catch (error) {
-        console.error('Gagal mengambil rekomendasi artikel:', error);
-      }
-    };
-
     fetchRecommended();
-  }, [article.title]);
+  }, [article]);
 
-  if (!article) return <div className="p-4 text-red-500">Artikel tidak ditemukan</div>;
+  if (!article) {
+    return <div className="p-4 text-red-500">Artikel tidak ditemukan</div>;
+  }
 
   return (
     <div className="p-4 max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
